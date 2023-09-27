@@ -23,36 +23,43 @@ vector <int> sufixArray(string sentence){
     sentence.append("$");
     int n = sentence.length();
 
-    //vector vacio que llenaremos con los substrings
-    vector<string> vecString;
-
-
-    for(int i = 0;i<n;i++){
-        //substr(indice del inicio de la cadena, longitud de la cadena)
-        vecString.push_back(sentence.substr(n-i-1,i+1));
-    }
-
-    sort(vecString.begin(),vecString.end());
-
-    vector<int> respuesta(n);
+    //empty vector to save suffixes 
+    vector<string> vecSufix;
 
     for(int i = 0;i<n;i++){
-        respuesta[i] = n - vecString[i].size();
+        vecSufix.push_back(sentence.substr(n-i-1,i+1));
     }
-    return respuesta;
+    // Sort the suffixes lexicographically
+    sort(vecSufix.begin(),vecSufix.end());
+
+    vector<int> sufixArray(n);
+
+    for(int i = 0;i<n;i++){
+        sufixArray[i] = n - vecSufix[i].size();
+    }
+    return sufixArray;
 }
 
 
-int main(){
+int main() {
+    vector<string> sentences = {
+        "The vaulty heaven so high above our heads.",
+        "Some say the lark and loathed toad change eyes.",
+        "Your lady mother is coming to your chamber.",
+        "I am too young, I pray you pardon me",
+        "My husband is on earth, my faith in heaven."
+    };
 
-    string sentence = "bcdeabcedeb";
-    int n = sentence.length();
+    for (const string& sentence : sentences) {
+        int n = sentence.length();
+        cout << "Sentence: " << sentence << endl;
+        cout << "Suffix array:" << endl;
+        vector<int> sufixAnswer = sufixArray(sentence);
 
-    cout << "String: " << sentence << " Suffix array: " <<endl;
-    vector<int> respuesta = sufixArray(sentence);
-
-    for(int i = 0;i<=n;i++){
-        cout<<respuesta[i]<<" ";
+        for (int i = 0; i < n; i++) {
+            cout << sufixAnswer[i] << " ";
+        }
+        cout << endl << endl;
     }
 
     return 0;
