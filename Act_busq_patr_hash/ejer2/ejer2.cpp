@@ -15,7 +15,7 @@ long long pollynomialRollingHash(string& word){
     long long hashValue = 0;
     long long power = 1;
     for(char c: word){
-        hashValue = (hashValue+(c-'a'+1)*power)%largeModPrime;
+        hashValue = (hashValue+(c-'a'+29)*power)%largeModPrime;
         power=(power*prime)%largeModPrime;
     }
     return hashValue;
