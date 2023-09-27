@@ -4,11 +4,12 @@
 #include <sstream>
 #include <cctype> 
 #include <map>
+#include <algorithm>
 
 using namespace std;
 
-const int prime = 47;
-const int largeModPrime = 1e9 + 9; //another prime num ber
+const int prime = 97;
+const long long largeModPrime = 1e9 + 9; //another prime num ber
 
 long long pollynomialRollingHash(string& word){
     long long hashValue = 0;
@@ -76,7 +77,7 @@ int main() {
     cout << hashV2 << endl;
     cout << hashV3 << endl;
     */
-    vector<string> words = fillVectorWithWords("test.txt");
+    vector<string> words = fillVectorWithWords("romeo_and_juliet.txt");
     /*
     for (string& word : words) {
         cout << word << endl;
@@ -84,16 +85,23 @@ int main() {
     */
     map<long long, pair<string, int>> wo = countOccurrences(words);
     
-    for (auto& entry : wo) {
+    vector<pair<long long, pair<string, int>>> orderedOccurrences(wo.begin(), wo.end());
+
+    // Ordenar el vector en función del valor del numero
+    sort(orderedOccurrences.begin(), orderedOccurrences.end(), [](const auto& a, const auto& b) {
+        return a.second.second > b.second.second; // Ordenar
+    });
+    int numberIteration = 1;
+    for (auto& entry : orderedOccurrences) {
         long long hash = entry.first;
         string word = entry.second.first;
         int count = entry.second.second;
 
-        cout << "Hash: " << hash << ", Word: " << word << ", Count: " << count << endl;
+        cout << numberIteration <<". Hash: " << hash << ", Word: " << word << ", Count: " << count << endl;
+        numberIteration++;
+        if(numberIteration>=21){
+            break;
+        }
     }
-    
-    
-    
-
     return 0;
 }
