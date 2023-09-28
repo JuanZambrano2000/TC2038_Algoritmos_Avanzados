@@ -21,12 +21,69 @@
 
 using namespace std;
 using namespace std::chrono;
+//pseudocode from chatgpt
+vector<int> buildPrefixTable(const string& pattern) {
+    int m = pattern.length();
+    vector<int> prefixTable(m, 0);
+    int length = 0;  
+    for (int i = 1; i < m;) {
+        if (pattern[i] == pattern[length]) {
+            length++;
+            prefixTable[i] = length;
+            i++;
+        } else {
+            if (length != 0) {
+                length = prefixTable[length - 1];
+            } else {
+                prefixTable[i] = 0;
+                i++;
+            }
+        }
+    }
+    return prefixTable;
+}
+
+int KMP(const string& text, const string& pattern) {
+    int n = text.length();
+    int m = pattern.length();
+    vector<int> prefixTable = buildPrefixTable(pattern);
+
+    int count = 0;  // Count of pattern occurrences
+    int i = 0;      // Index for text[]
+    int j = 0;      // Index for pattern[]
+
+    while (i < n) {
+        if (pattern[j] == text[i]) {
+            j++;
+            i++;
+        }
+
+        if (j == m) {
+            // Pattern found at index i - j
+            count++;
+            j = prefixTable[j - 1];
+            // Uncomment to see the whole phrase
+            
+            int start = max(0, i - 50);
+            int end = min(n - 1, i + 50);
+            cout << text.substr(start, end - start + 1) << endl;
+            
+        } else if (i < n && pattern[j] != text[i]) {
+            if (j != 0) {
+                j = prefixTable[j - 1];
+            } else {
+                i++;
+            }
+        }
+    }
+
+    return count;
+}
 
 vector<int> zFunction(string text){
     
     int n = text.length();
     vector<int> zVector(n,0);
-
 
     for(int i = 1, l = 0, r = 0; i<n;i++){
         if(i <= r){
@@ -40,7 +97,6 @@ vector<int> zFunction(string text){
             r = i + zVector[i] - 1;
         }
     }
-
     return zVector;
 }
 
@@ -59,7 +115,8 @@ int main() {
     file.close();
 
     vector<string> patterns = {"ROMEO", "JULIET", "NURSE", "CAPULET", "hola"};
-
+    cout<<endl;
+    cout<<"Funcion Z"<<endl;
     for (const string& pattern : patterns) {
         string text = pattern + "*" + fileContent;
         int n = fileContent.length();
@@ -74,6 +131,7 @@ int main() {
         for (int i = 0; i < n; i++) {
             if (vectorZ[i] == pattern.length()) {
                 patternCount++;
+                //uncomment to see the phrase
                 /*
                 for (int y = 0; y < 50; y++) {
                     cout << text[i + y];
@@ -84,5 +142,16 @@ int main() {
         }
         cout << "Patron: " << pattern << ", tiempo de busqueda: " << duration.count() << " ms, numero de ocurrencias: " << patternCount << endl;
     }
+    cout<<endl;
+    cout<<"KMP"<<endl;
+    for (const string& pattern : patterns) {
+        auto start = high_resolution_clock::now();
+        int occurencesKMP = KMP(fileContent, pattern);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+        cout << "Patron: " << pattern << ", tiempo de busqueda: " << duration.count() << " ms, numero de ocurrencias: " <<  occurencesKMP << endl;
+    }
+        
+
     return 0;
 }
