@@ -17,34 +17,35 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
-vector<int> funcionZ(string text){
+vector<int> zFunction(string text){
     
     int n = text.length();
-    vector<int> vectorZ(n,0);
+    vector<int> zVector(n,0);
 
 
     for(int i = 1, l = 0, r = 0; i<n;i++){
         if(i <= r){
-            vectorZ[i] = min(r-i+1, vectorZ[i-l]);
+            zVector[i] = min(r-i+1, zVector[i-l]);
         }
-        while(i + vectorZ[i] < n && text[vectorZ[i]] == text[i+vectorZ[i]]){
-            vectorZ[i] = vectorZ[i]+1;
+        while(i + zVector[i] < n && text[zVector[i]] == text[i+zVector[i]]){
+            zVector[i] = zVector[i]+1;
         }
-        if(i+vectorZ[i] - 1  > r){
+        if(i+zVector[i] - 1  > r){
             l = i;
-            r = i + vectorZ[i] - 1;
+            r = i + zVector[i] - 1;
         }
     }
 
-    return vectorZ;
+    return zVector;
 }
 
-int main(){
-
-    ifstream file("test.txt");
+int main() {
+    ifstream file("romeo_and_juliet.txt");
     if (!file.is_open()) {
         cerr << "Error abriendo el archivo, revisa la ruta o el nombre" << endl;
     }
@@ -57,23 +58,31 @@ int main(){
     }
     file.close();
 
-    vector<string> patterns = {"not", "adios", "the", "it", "hola"};
+    vector<string> patterns = {"ROMEO", "JULIET", "NURSE", "CAPULET", "hola"};
 
     for (const string& pattern : patterns) {
         string text = pattern + "*" + fileContent;
-
         int n = fileContent.length();
-        vector<int> vectorZ = funcionZ(text);
+        // Measure the time for the search
+        auto start = high_resolution_clock::now();
+        vector<int> vectorZ = zFunction(text);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+
+        int patternCount = 0;
 
         for (int i = 0; i < n; i++) {
             if (vectorZ[i] == pattern.length()) {
+                patternCount++;
+                /*
                 for (int y = 0; y < 50; y++) {
                     cout << text[i + y];
                 }
                 cout << endl;
-                cout << endl;
+                */
             }
         }
+        cout << "Patron: " << pattern << ", tiempo de busqueda: " << duration.count() << " ms, numero de ocurrencias: " << patternCount << endl;
     }
     return 0;
-};
+}
