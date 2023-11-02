@@ -23,7 +23,7 @@ class Trie:
             node = node.children[char]
         return node.end_of_word
 
-    def starts_with(self, prefix):
+    def starts_width(self, prefix):
         node = self.root
         for char in prefix:
             if char not in node.children:
@@ -40,11 +40,13 @@ with open("aliceWonderland.txt", "r", encoding='utf-8') as book:
 search_words = ["Alice", "rabbit", "watch", "programacion", "tea", "queen", "king", "cat", 
                 "Cheshire", "gryphon", "mock", "turtle", "hatter", "dormouse", "caterpillar", 
                 "he", "ejemplo", "poison", "eat", "hola"]
-start_with_words = ["Alice", "rab", "wat", "hol", "te", "que", "kin", "ca", "zwq", "gry",
+start_width_words = ["Alice", "rab", "wat", "hol", "te", "que", "kin", "ca", "zwq", "gry",
                     "mock", "tur", "hat", "dor", "turtl", "hatt", "ejem", "poi", "ea", "hoqw"]
 
+print("\nSearch words\n")
 for word in search_words:
     print(f"Search of word: {word}: ", trie.search(word))
 
-for wordSW in start_with_words:
-    print(f"Starts with : {wordSW}", trie.starts_with(start_with_words))
+print("\nStarts width\n")
+for wordSW in start_width_words:
+    print(f"Starts width : {wordSW}", trie.starts_width(wordSW))
