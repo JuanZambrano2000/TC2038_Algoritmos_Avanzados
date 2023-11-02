@@ -89,6 +89,39 @@ class WeightedGraph:
                     heapq.heappush(priority_queue, (distance, neighbor))
         
         return distances
+    
+    def floyd_warshall(self):
+        # Step 1: Initialize the distance matrix
+        vertices = list(self.adjacency_list)
+        num_vertices = len(vertices)
+        vertex_index = {vertex: i for i, vertex in enumerate(vertices)}
+        inf = float('infinity')
+        distance_matrix = [[inf] * num_vertices for _ in range(num_vertices)]
+
+        for i in range(num_vertices):
+            distance_matrix[i][i] = 0
+
+        for vertex, edges in self.adjacency_list.items():
+            for neighbor, weight in edges:
+                i, j = vertex_index[vertex], vertex_index[neighbor]
+                distance_matrix[i][j] = weight
+
+        # Step 2: Floyd-Warshall algorithm
+        for k in range(num_vertices):
+            for i in range(num_vertices):
+                for j in range(num_vertices):
+                    distance_matrix[i][j] = min(
+                        distance_matrix[i][j],
+                        distance_matrix[i][k] + distance_matrix[k][j]
+                    )
+
+        # Optional: Convert distances back to dictionary form for easier readability
+        distances = {
+            (vertices[i], vertices[j]): distance_matrix[i][j]
+            for i in range(num_vertices) for j in range(num_vertices)
+        }
+
+        return distances
 
 graph = WeightedGraph()
 
@@ -124,6 +157,12 @@ edges = [
 for edge in edges:
     graph.add_edge(*edge)
 
+print("Dijsktra shortest path\n")
 distances = graph.dijkstra('Goding')
 for vertex, distance in distances.items():
     print(f"Distance from Goding to {vertex}: {distance}")
+
+print("\nFloyd-Warshall shortest path\n")
+all_pairs_shortest_path = graph.floyd_warshall()
+for vertices, distance in all_pairs_shortest_path.items():
+    print(f"Distance from {vertices[0]} to {vertices[1]}: {distance}")
