@@ -1,3 +1,4 @@
+import heapq
 class DisjointSet:
     def __init__(self, vertices):
         self.vertices = vertices
@@ -33,8 +34,38 @@ def kruskal(graph):
 
     return mst
 
-# Example usage
-edges = [
+def prim(graph, start_vertex):
+    # Convert graph to adjacency list
+    adjacency_list = {}
+    for edge in graph:
+        vertex1, vertex2, weight = edge
+        if vertex1 not in adjacency_list:
+            adjacency_list[vertex1] = []
+        if vertex2 not in adjacency_list:
+            adjacency_list[vertex2] = []
+        adjacency_list[vertex1].append((vertex2, weight))
+        adjacency_list[vertex2].append((vertex1, weight))
+    
+    # Initialize min heap, visited set, MST and predecessor map
+    min_heap = [(0, start_vertex, None)]  # heap elements are tuples (weight, vertex, predecessor)
+    visited = set()
+    mst = []
+    predecessor = {start_vertex: None}
+
+    while min_heap:
+        weight, current_vertex, prev_vertex = heapq.heappop(min_heap)
+        if current_vertex not in visited:
+            visited.add(current_vertex)
+            if prev_vertex is not None:  # Avoid adding the starting vertex
+                mst.append((prev_vertex, current_vertex, weight))
+
+            for neighbor, edge_weight in adjacency_list[current_vertex]:
+                if neighbor not in visited:
+                    heapq.heappush(min_heap, (edge_weight, neighbor, current_vertex))
+    
+    return mst
+
+graph = [
     ('Ylane', 'Goding', 88),
     ('Ylane', 'Strento', 99),
     ('Ylane', 'Oriaron', 117),
@@ -58,5 +89,9 @@ edges = [
     ('Goxmont', 'Niaphia', 212)
 ]
 
-minSpanTree = kruskal(edges)
-print(minSpanTree)
+minSpanTreeKruskal = kruskal(graph)
+minSpanTreePrim = prim(graph, 'Adaset')
+print("Minimum Spanning Tree Kruskal") 
+print(minSpanTreeKruskal)
+print("Minimum Spanning Tree Prim")
+print(minSpanTreePrim)
