@@ -1,75 +1,64 @@
 class RangeTreeNode:
-    def __init__(self, value):
+    def __init__(self, low, high, value, left=None, right=None):
+        self.low = low
+        self.high = high
         self.value = value
-        self.left = None
-        self.right = None
-        self.subtree_values = []
+        self.left = left
+        self.right = right
 
-class RangeTree:
-    def __init__(self, values):
-        self.root = self.build_tree(sorted(values))
-
-    def build_tree(self, values):
-        if not values:
-            return None
-        
-        mid = len(values) // 2
-        node = RangeTreeNode(values[mid])
-        node.left = self.build_tree(values[:mid])
-        node.right = self.build_tree(values[mid+1:])
-        node.subtree_values = values
-        return node
-
-    # Method to find the split node
-    def find_split_node(self, root, low, high):
-        node = root
-        while node and not (low <= node.value <= high):
-            if low < node.value:
-                node = node.left
+    def find_split_node(self, value):
+        if value < self.value:
+            if self.left is None:
+                return self
             else:
-                node = node.right
-        return node
+                return self.left.find_split_node(value)
+        elif value > self.value:
+            if self.right is None:
+                return self
+            else:
+                return self.right.find_split_node(value)
+        else:
+            return self
 
-    # Method to report values in range
-    def values_in_range(self, root, low, high):
-        def report_subtree(node):
-            if node:
-                for value in node.subtree_values:
-                    if low <= value <= high:
-                        result.append(value)
+    def values_in_range(self, low, high):
+        # List to store values within the range
+        values = []
 
-        result = []
-        split_node = self.find_split_node(root, low, high)
+        # If the current node is within the range, add its value
+        if low <= self.value <= high:
+            values.append(self.value)
 
-        if split_node is None:
-            return result
+        # If the left child exists and the range intersects with its range, traverse left
+        if self.left is not None and low <= self.left.high:
+            values.extend(self.left.values_in_range(low, high))
 
-        # Traverse the left side from the split node
-        if split_node.value >= low:
-            node = split_node.left
-            while node:
-                if low <= node.value:
-                    report_subtree(node.right)
-                    node = node.left
-                else:
-                    node = node.right
+        # If the right child exists and the range intersects with its range, traverse right
+        if self.right is not None and high >= self.right.low:
+            values.extend(self.right.values_in_range(low, high))
 
-        # Traverse the right side from the split node
-        if split_node.value <= high:
-            node = split_node.right
-            while node:
-                if high >= node.value:
-                    report_subtree(node.left)
-                    node = node.right
-                else:
-                    node = node.left
+        return values
 
-        # Add split node value if it's in range
-        if low <= split_node.value <= high:
-            result.append(split_node.value)
+def build_range_tree(values):
+    if not values:
+        return None
 
-        return result
+    values = sorted(values)  # Make sure values are sorted
+    median_index = len(values) // 2
+    median_value = values[median_index]
 
-values = [1, 3, 5, 7, 9, 11]
-tree = RangeTree(values)
-print(tree.values_in_range(tree.root, 4, 10))  # This will return [5, 7,
+    left_values = values[:median_index]
+    right_values = values[median_index + 1:]
+
+    left_node = build_range_tree(left_values)
+    right_node = build_range_tree(right_values)
+
+    return RangeTreeNode(min(values), max(values), median_value, left_node, right_node)
+
+values = [5, 2, 4, 1, 3]
+range_tree = build_range_tree(values)
+
+split_node = range_tree.find_split_node(6)
+print("Split node value:", split_node.value)
+
+values_in_range = range_tree.values_in_range(2, 6)
+print("Values in range 2-4:", values_in_range)
