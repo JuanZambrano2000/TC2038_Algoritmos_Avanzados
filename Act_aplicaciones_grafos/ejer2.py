@@ -1,13 +1,6 @@
-#------------------------------------------------------------------------------------------------------------------
-#   Solution to the Travel Salesman problem using uniform cost search and branch and bound.
-#------------------------------------------------------------------------------------------------------------------
-
 from queue import PriorityQueue
 import copy
 
-#------------------------------------------------------------------------------------------------------------------
-#   WeightedGraph class
-#------------------------------------------------------------------------------------------------------------------
 class WeightedGraph:
   """ 
         Class that is used to represent a weighted graph. Internally, the class uses an adjacency list to store 
@@ -214,10 +207,6 @@ class WeightedGraph:
       for edges in self._adjacency_list[vertex]:
         print(vertex, " -> ", edges[0], " edge weight: ", edges[1])
 
-
-#------------------------------------------------------------------------------------------------------------------
-#   Uniform cost search algorithm for the TSP problem
-#------------------------------------------------------------------------------------------------------------------
 class TspUcsNode:
   """ 
         Class that is used to represent a node in the uniform search algorithm for the TSP problem. 
@@ -262,78 +251,41 @@ def tsp_ucs(graph: WeightedGraph, v0):
   vertices = graph.vertices()
   n = len(vertices)
 
-  # Check graph and initial vertex
   if v0 not in vertices:
     print("Warning: Vertex", v0, "is not in Graph")
 
-  # Initialize frontier
   frontier = PriorityQueue()
   frontier.put((0, TspUcsNode(None, v0, 0, [(v0, 0)])))
 
-  # Find cycle
   while True:
     if frontier.empty():
       return None
 
-    # Get node from frontier
     node = frontier.get()[1]
 
-    # Test node
     if len(node.explored) == (n + 1) and node.v == v0:
-      # Return path and cost as a dictionary
       return {"Path": node.explored, "Cost": node.c}
 
-    # Expand node
     adjacent_vertices = gr.adjacent_vertices(node.v)
     for vertex in adjacent_vertices:
       already_included = False
 
-      # Check if the adjacent vertex is the initial vertex. The initial
-      # vertex can be included only at the end of the cycle.
       if vertex[0] == v0 and len(node.explored) < n:
         already_included = True
 
-      # Check if the vertex has been already included in the cycle.
       for i in range(1, len(node.explored)):
         if vertex[0] == node.explored[i][0]:
           already_included = True
           break
 
-      # Add the vertex if it is not already included in the cycle.
       if not already_included:
         cost = vertex[1] + node.c
         frontier.put(
             (cost, TspUcsNode(node, vertex[0], cost,
                               node.explored + [vertex])))
 
-
-#------------------------------------------------------------------------------------------------------------------
-#   Branch and bound algorithm for the TSP problem
-#------------------------------------------------------------------------------------------------------------------
-
-
 class TspBBNode:
-  """ 
-        Class that is used to represent a node in the search algorithm for the TSP problem. 
-        A node contains the following elements:
-        * A reference to its parent.
-        * The vertex of the graph that is represented.
-        * The total path cost from the root to the node.
-        * The list of explored nodes.
-        * The reduction matrix.
-    """
-
   def __init__(self, parent, v, c, cpos, explored, m):
-    """ 
-            This constructor initializes a node. 
-
-            param parent: The node parent.
-            param v: The graph vertex that is represented by the node.
-            param c: The path cost to the node from the root.
-            param cpos: The possible path cost of the cycle.
-            param explored: The path from the root to the node.
-            param m: The reduction matrix of the node.
-        """
     self.parent = parent
     self.v = v
     self.c = c
@@ -342,9 +294,6 @@ class TspBBNode:
     self.m = m
 
   def __lt__(self, node):
-    """ 
-            Operator <. This definition is requiered by the PriorityQueue class.
-        """
     return False
 
 
@@ -362,11 +311,9 @@ def tsp_bb(graph: WeightedGraph, v0):
   vertices = graph.vertices()
   n = len(vertices)
 
-  # Check graph and initial vertex
   if v0 not in vertices:
     print("Warning: Vertex", v0, "is not in Graph")
 
-  ################ Reduction matrix ################
   vindices = {}
   for i, v in enumerate(vertices, 0):
     vindices[v] = i
@@ -405,20 +352,14 @@ def tsp_bb(graph: WeightedGraph, v0):
       if m[i][j] != inf_val:
         m[i][j] -= rcols[j]
 
-  # Reduction cost
   red_cost = sum(rrows) + sum(rcols)
 
-  #################################################
-
-  # Initialize frontier
   frontier = PriorityQueue()
   frontier.put((0, TspBBNode(None, v0, 0, red_cost, [(v0, 0)], m)))
 
-  # Initialize best solution
   best = None
   best_val = inf_val
 
-  # Find cycle
   while not frontier.empty():
 
     # Get node from frontier
@@ -431,34 +372,25 @@ def tsp_bb(graph: WeightedGraph, v0):
         best_val = node.c
       continue
 
-    # Expand node
     adjacent_vertices = gr.adjacent_vertices(node.v)
     for vertex in adjacent_vertices:
       already_included = False
 
-      # Check if the adjacent vertex is the initial vertex. The initial
-      # vertex can be included only at the end of the cycle.
       if vertex[0] == v0 and len(node.explored) < n:
         already_included = True
 
-      # Check if the vertex has been already included in the cycle.
       for i in range(1, len(node.explored)):
         if vertex[0] == node.explored[i][0]:
           already_included = True
           break
-
-      # Add the vertex if it is not already included in the cycle.
       if not already_included:
         cost = vertex[1] + node.c
         new_explored = node.explored + [vertex]
 
-        ################ Reduction matrix ################
         m = copy.deepcopy(node.m)
 
         row = vindices[node.v]
         col = vindices[vertex[0]]
-
-        # Fill with inf_val rows and columns of vertices in the path
         for k in range(n):
           m[row][k] = inf_val
 
@@ -472,7 +404,6 @@ def tsp_bb(graph: WeightedGraph, v0):
             m[v1][v2] = inf_val
             m[v2][v1] = inf_val
 
-        # Reduce rows
         rrows = [0] * n
         for i in range(n):
           rrows[i] = min(m[i])
@@ -483,7 +414,6 @@ def tsp_bb(graph: WeightedGraph, v0):
             if m[i][j] != inf_val:
               m[i][j] -= rrows[i]
 
-        # Reduce columns
         rcols = [0] * n
         for j in range(n):
           col = [m[i][j] for i in range(n)]
@@ -498,92 +428,35 @@ def tsp_bb(graph: WeightedGraph, v0):
         reduced_cost = sum(rrows) + sum(rcols)
 
         cpos = vertex[1] + node.cpos + red_cost
-        #################################################
-
         if cpos < best_val:
           frontier.put(
               (cpos, TspBBNode(node, vertex[0], cost, cpos, new_explored, m)))
 
   return {"Path": best.explored, "Cost": best.c}
 
-
-#------------------------------------------------------------------------------------------------------------------
-#   Algorithm test
-#------------------------------------------------------------------------------------------------------------------
-
-# Create graph
 gr = WeightedGraph(directed=False)
 
-# VERTEX
-gr.add_vertex('A')
-gr.add_vertex('B')
-gr.add_vertex('C')
-gr.add_vertex('D')
-gr.add_vertex('E')
-gr.add_vertex('F')
-gr.add_vertex('G')
-gr.add_vertex('H')
-gr.add_vertex('I')
-gr.add_vertex('J')
-gr.add_vertex('K')
-gr.add_vertex('L')
-gr.add_vertex('M')
-gr.add_vertex('N')
-gr.add_vertex('O')
-gr.add_vertex('P')
-gr.add_vertex('Q')
-gr.add_vertex('R')
-gr.add_vertex('S')
-gr.add_vertex('T')
-gr.add_vertex('U')
+# Graph provided by chatgpt
+vertices = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U']
+for vertex in vertices:
+    gr.add_vertex(vertex)
 
-gr.add_edge('A', 'B', 6)
-gr.add_edge('A', 'D', 18)
-gr.add_edge('A', 'U', 24)
-gr.add_edge('B', 'C', 22)
-gr.add_edge('C', 'D', 12)
-gr.add_edge('C', 'F', 4)
-gr.add_edge('D', 'E', 36)
-gr.add_edge('E', 'H', 13)
-gr.add_edge('E', 'J', 7)
-gr.add_edge('F', 'G', 18)
-gr.add_edge('G', 'I', 13)
-gr.add_edge('H', 'I', 7)
-gr.add_edge('I', 'L', 31)
-gr.add_edge('J', 'L', 29)
-gr.add_edge('J', 'K', 20)
-gr.add_edge('K', 'N', 21)
-gr.add_edge('L', 'M', 24)
-gr.add_edge('M', 'O', 26)
-gr.add_edge('N', 'O', 11)
-gr.add_edge('N', 'Q', 9)
-gr.add_edge('O', 'P', 2)
-gr.add_edge('O', 'T', 31)
-gr.add_edge('P', 'Q', 23)
-gr.add_edge('P', 'R', 6)
-gr.add_edge('Q', 'R', 10)
-gr.add_edge('R', 'S', 29)
-gr.add_edge('S', 'U', 21)
-gr.add_edge('T', 'U', 40)
-gr.add_edge('T', 'S', 23)
-gr.add_edge('T', 'R', 29)
-gr.add_edge('F', 'A', 17)
-gr.add_edge('N', 'Q', 5)
-gr.add_edge('P', 'L', 39)
-gr.add_edge('I', 'O', 27)
-gr.add_edge('T', 'C', 2)
-gr.add_edge('F', 'Q', 27)
-gr.add_edge('I', 'G', 31)
-gr.add_edge('U', 'L', 28)
-gr.add_edge('M', 'S', 34)
-gr.add_edge('T', 'D', 7)
-gr.add_edge('J', 'A', 6)
-gr.add_edge('N', 'C', 30)
+edges = [
+    ('A', 'B', 6), ('A', 'D', 18), ('A', 'U', 24), ('B', 'C', 22), ('C', 'D', 12), ('C', 'F', 4), ('D', 'E', 36),
+    ('E', 'H', 13), ('E', 'J', 7), ('F', 'G', 18), ('G', 'I', 13), ('H', 'I', 7), ('I', 'L', 31), ('J', 'L', 29),
+    ('J', 'K', 20), ('K', 'N', 21), ('L', 'M', 24),('M', 'O', 26), ('N', 'O', 11), ('N', 'Q', 9), ('O', 'P', 2),
+    ('O', 'T', 31), ('P', 'Q', 23), ('P', 'R', 6), ('Q', 'R', 10), ('R', 'S', 29), ('S', 'U', 21), ('T', 'U', 40),
+    ('T', 'S', 23), ('T', 'R', 29), ('F', 'A', 17), ('N', 'Q', 5), ('P', 'L', 39), ('I', 'O', 27), ('T', 'C', 2),
+    ('F', 'Q', 27), ('I', 'G', 31), ('U', 'L', 28),('M', 'S', 34),('T', 'D', 7),('J', 'A', 6), ('N', 'C', 30)
+]
+for edge in edges:
+    gr.add_edge(*edge)
+
 
 print("Uniform cost search")
-res1 = tsp_ucs(gr, 'J')
+res1 = tsp_ucs(gr, 'A')
 print(res1)
 
 print("Branch and bound")
-res2 = tsp_bb(gr, 'J')
+res2 = tsp_bb(gr, 'A')
 print(res2)
