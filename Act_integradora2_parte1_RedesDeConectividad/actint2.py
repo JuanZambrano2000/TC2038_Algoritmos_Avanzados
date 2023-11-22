@@ -1005,15 +1005,10 @@ gr = WeightedGraph(directed = False)
 #Enviar a la funcion de graficas, el nombre de la matriz que vas a usar, el mapa de electrodos, y la grafica
 #Esto sirve para llenar la grafica de sus vectores y aristas
 
-#8 electerodos, las personales
-#graficas('Lectura_Stef.txt','mapa8electrodos.txt',gr)
-#graficas('Memoria_Stef.txt','mapa8electrodos.txt',gr)
-#graficas('Operaciones_Stef.txt','mapa8electrodos.txt',gr)
-
 #Las de 32 electrodos
 #graficas('LecturaS0A.txt', 'mapa32electrodos.txt', gr)
-graficas('MemoriaS0A.txt', 'mapa32electrodos.txt', gr)
-#graficas('OperacionesS0A.txt', 'mapa32electrodos.txt', gr)
+#graficas('MemoriaS0A.txt', 'mapa32electrodos.txt', gr)
+graficas('OperacionesS0A.txt', 'mapa32electrodos.txt', gr)
 
 
 #Para graficar la grafica junto con sus caminos
@@ -1039,13 +1034,13 @@ prepCaminos(arregloOD32,1,gr)
 grFloyd = WeightedGraphFloyd(directed = False)
 
 #Matriz de conexion, 0 y 1
-#graficas('Lectura_Stef.txt', 'mapa8electrodos.txt', grFloyd)
-#graficas('Memoria_Stef.txt', 'mapa8electrodos.txt', grFloyd)
-#graficas('Operaciones_Stef.txt', 'mapa8electrodos.txt', grFloyd)
+#graficas('LecturaFab.txt', 'mapa8electrodos.txt', grFloyd)
+#graficas('MemoriaFab.txt', 'mapa8electrodos.txt', grFloyd)
+#graficas('OperacionesFab.txt', 'mapa8electrodos.txt', grFloyd)
 
 #graficas('LecturaS0A.txt', 'mapa32electrodos.txt', grFloyd)
-graficas('MemoriaS0A.txt', 'mapa32electrodos.txt', grFloyd)
-#graficas('OperacionesS0A.txt', 'mapa32electrodos.txt', grFloyd)
+#graficas('MemoriaS0A.txt', 'mapa32electrodos.txt', grFloyd)
+graficas('OperacionesS0A.txt', 'mapa32electrodos.txt', grFloyd)
 
 print("Length of shortest paths Matriz Floyd")
 print(floyd_marshall(grFloyd._adjacency_matrix))
