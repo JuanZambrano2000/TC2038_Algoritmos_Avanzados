@@ -918,7 +918,7 @@ def graham(coordenadasTexto, graph=WeightedGraph):
     #Se obtiene y se ordena la lista de los angulos en comparacion al pivote
     listaAngulos = []
     for x in range(len(coordenadas)):
-        if x != pivote:
+        if x != pivote and coordenadas[x][0] in graph.vertices():
             angulo = calcular_angulo_entre_puntos(float(coordenadas[pivote][1]),float(coordenadas[pivote][2]),float(coordenadas[x][1]),float(coordenadas[x][2]))
             z = float(coordenadas[pivote][1])
             distancia = math.sqrt((float(coordenadas[x][1]) - float(coordenadas[pivote][1]))**2 + (float(coordenadas[x][2]) - float(coordenadas[pivote][2]))**2)
@@ -926,6 +926,8 @@ def graham(coordenadasTexto, graph=WeightedGraph):
 
     #angulo, vertice 
     listaAngulos = sorted(listaAngulos, key = lambda x: (x[0], x[2]))
+
+    print(listaAngulos)
 
     casco = [pivote, listaAngulos[0][1]]
     
@@ -1006,7 +1008,7 @@ gr = WeightedGraph(directed = False)
 #Esto sirve para llenar la grafica de sus vectores y aristas
 
 #Matriz de conexion, 0 y 1
-graficas('LecturaFab.txt', 'mapa8electrodos.txt', gr)
+graficas('LecturaDiego.txt', 'mapa8electrodos.txt', gr)
 #graficas('MemoriaFab.txt', 'mapa8electrodos.txt', gr)
 #graficas('OperacionesFab.txt', 'mapa8electrodos.txt', gr)
 
@@ -1018,7 +1020,7 @@ graficas('LecturaFab.txt', 'mapa8electrodos.txt', gr)
 
 
 #Para graficar la grafica junto con sus caminos
-graficarGraficas8(gr)
+#graficarGraficas8(gr)
 #graficarGraficas32(gr)
 
 """
@@ -1034,11 +1036,11 @@ arregloOD8 = [('Fz','PO8'),('C3','Oz'),('PO7','C4'),('Oz','PO7'),('Cz','Pz')]
 arregloOD32 = [('F7','PO4'),('CP5','O2'),('P4','T7'),('AF3','CP6'),('F8','CP2'),('CP1','FC2'),('F3','O1')]
 
 
-prepCaminos(arregloOD8,0,gr)
+#prepCaminos(arregloOD8,0,gr)
 #prepCaminos(arregloOD32,1,gr)
 
 grFloyd = WeightedGraphFloyd(directed = False)
-
+'''
 #Matriz de conexion, 0 y 1
 graficas('LecturaFab.txt', 'mapa8electrodos.txt', grFloyd)
 #graficas('MemoriaFab.txt', 'mapa8electrodos.txt', grFloyd)
@@ -1050,9 +1052,9 @@ graficas('LecturaFab.txt', 'mapa8electrodos.txt', grFloyd)
 
 print("Length of shortest paths Matriz Floyd")
 print(floyd_marshall(grFloyd._adjacency_matrix))
-
+'''
 #Parte 3
-
+graficas('LecturaDiego.txt', 'mapa8electrodos.txt', grFloyd)
 #Para prim se tiene que crear una nueva grafica que se llenara con los valores ddel arbol minimo
 newGraph = WeightedGraph(directed = False)
 #Se envia la funcion el grafico desde donde comenzar, una grafica ya al 100%, y la nueva grafica
@@ -1079,5 +1081,5 @@ plotGraham('mapa8electrodos.txt', grahamPoints)
 #plotGraham('mapa32electrodos.txt', grahamPoints)
 
 #Parte 5
-voronoi('mapa8electrodos.txt', gr)
+#voronoi('mapa8electrodos.txt', gr)
 #voronoi('mapa32electrodos.txt', gr)
