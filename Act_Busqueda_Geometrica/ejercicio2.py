@@ -1,3 +1,6 @@
+import random
+import matplotlib.pyplot as plt
+
 class Node:
     def __init__(self, point, left=None, right=None):
         self.point = point  # the point in 2D space
@@ -54,11 +57,25 @@ def distance_squared(point1, point2):
 def distance_to_axis(point, tree_point, axis):
     return (point[axis] - tree_point[axis]) ** 2
 
-
-
+'''
 points = [(2, 3), (5, 4), (9, 6), (4, 7), (8, 1), (7, 2)]
 
 tree = KDTree(points)
 point_to_find = (9, 2)
 nearest = find_nearest(tree.root, point_to_find)
 print(f"The nearest point to {point_to_find} is {nearest}")
+'''
+#Provided by chatgpt
+# Generate 200 random points with x and y coordinates between -10 and 10
+points = [(random.uniform(-10, 10), random.uniform(-10, 10)) for _ in range(200)]
+
+# Plotting the points
+plt.figure(figsize=(8, 8))
+plt.scatter(*zip(*points), color='blue')
+plt.title('200 Random Points in 2D Space')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.xlim(-10, 10)
+plt.ylim(-10, 10)
+plt.grid(True)
+plt.show()
