@@ -57,6 +57,12 @@ def distance_squared(point1, point2):
 def distance_to_axis(point, tree_point, axis):
     return (point[axis] - tree_point[axis]) ** 2
 
+def is_within_ranges(point, x_ranges, y_ranges):
+    """Check if a point is within the specified x and y ranges."""
+    x, y = point
+    return any(x_min <= x <= x_max for x_min, x_max in x_ranges) and \
+           any(y_min <= y <= y_max for y_min, y_max in y_ranges)
+
 '''
 points = [(2, 3), (5, 4), (9, 6), (4, 7), (8, 1), (7, 2)]
 
@@ -66,16 +72,61 @@ nearest = find_nearest(tree.root, point_to_find)
 print(f"The nearest point to {point_to_find} is {nearest}")
 '''
 #Provided by chatgpt
-# Generate 200 random points with x and y coordinates between -10 and 10
+
+# Generate 200 random points
 points = [(random.uniform(-10, 10), random.uniform(-10, 10)) for _ in range(200)]
 
-# Plotting the points
-plt.figure(figsize=(8, 8))
-plt.scatter(*zip(*points), color='blue')
-plt.title('200 Random Points in 2D Space')
+# Create the KD Tree
+tree = KDTree(points)
+
+# Define search points
+search_points_x = [(-1, 1), (-2, 1), (-7, 0), (-2, 2), (-7, 5)]
+search_points_y = [(-2, 2), (3, 5), (-6, 4), (-3, 3), (-3, 1)]
+
+# Find nearest points
+nearest_points_x = [find_nearest(tree.root, p) for p in search_points_x]
+nearest_points_y = [find_nearest(tree.root, p) for p in search_points_y]
+
+# Plotting
+plt.figure(figsize=(10, 10))
+plt.scatter(*zip(*points), color='blue', label='Original Points')
+plt.scatter(*zip(*search_points_x), color='red', marker='x', label='Search Points X-axis')
+plt.scatter(*zip(*search_points_y), color='green', marker='x', label='Search Points Y-axis')
+plt.scatter(*zip(*nearest_points_x), color='red', label='Nearest Points X-axis')
+plt.scatter(*zip(*nearest_points_y), color='green', label='Nearest Points Y-axis')
+
+# Adding x-axis and y-axis
+plt.axhline(0, color='black',linewidth=0.8)
+plt.axvline(0, color='black',linewidth=0.8)
+
+plt.title('KD Tree Nearest Neighbor Search')
 plt.xlabel('X-axis')
 plt.ylabel('Y-axis')
 plt.xlim(-10, 10)
 plt.ylim(-10, 10)
 plt.grid(True)
+plt.legend()
+plt.show()
+
+# Find points within the specified ranges
+points_within_ranges = [p for p in points if is_within_ranges(p, search_points_x, search_points_y)]
+
+# Plotting
+plt.figure(figsize=(10, 10))
+plt.scatter(*zip(*points), color='blue', label='Original Points')
+plt.scatter(*zip(*points_within_ranges), color='orange', label='Points Within Ranges')
+plt.scatter(*zip(*search_points_x), color='red', marker='x', label='Search Points X-axis')
+plt.scatter(*zip(*search_points_y), color='green', marker='x', label='Search Points Y-axis')
+
+# Adding x-axis and y-axis
+plt.axhline(0, color='black', linewidth=0.8)
+plt.axvline(0, color='black', linewidth=0.8)
+
+plt.title('Points Within Specified Ranges')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.xlim(-10, 10)
+plt.ylim(-10, 10)
+plt.grid(True)
+plt.legend()
 plt.show()
