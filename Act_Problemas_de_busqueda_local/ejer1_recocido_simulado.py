@@ -1,6 +1,5 @@
 #------------------------------------------------------------------------------------------------------------------
-#   Greedy search algorithm for the n-queen problem
-#   Code provided by phd. Omar Mendoza
+#   Simulated annealing solver for the n-queen problem
 #------------------------------------------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------------------------------------------
@@ -15,13 +14,15 @@ import math
 #------------------------------------------------------------------------------------------------------------------
 
 class Board(object):
-    """ Class that represents n-queens placed on a chess board. """
+    """ 
+        Class that represents n-queens placed on a chess board. The board is represented by an array
+        of n rows and two columns. Each row corresponds to one queen, and the columns represent
+        the coordinates.
+    """
     
     def __init__(self, n, randomize = True):        
         """ 
-            This constructor initializes the board with n queens. The board is represented by an array
-            of n rows and two columns. Each row corresponds to one queen, and the columns represent
-            the coordinates.
+            This constructor initializes the board with n queens. 
 
             n: The number of rows and columns of the chess.
             randomize: True indicates that the initial queen positions are choosen randomly.
@@ -30,7 +31,7 @@ class Board(object):
         self.n = n
         self.queens = []
         if (randomize):
-            # Initialize randomly the board
+            # Initialize the board randomly
             for q in range(n):
                 empty_space = False
                 while not empty_space:
@@ -113,15 +114,19 @@ class Board(object):
 random.seed(time.time()*1000)
 
 board = Board(8, True)      # Initialize board
-
-print("-------- Initial board -----------")
-board.show()
+board.show()    
 
 cost = board.cost()         # Initial cost    
 step = 0                    # Step count
 
-while step < 100000 and cost > 0:
+alpha = 0.9995              # Coefficient of the exponential temperature schedule        
+t0 = 1                      # Initial temperature
+t = t0    
 
+while t > 0.005 and cost > 0:
+
+    # Calculate temperature
+    t = t0 * math.pow(alpha, step)
     step += 1
         
     # Get random neighbor
@@ -131,12 +136,18 @@ while step < 100000 and cost > 0:
     # Test neighbor
     if new_cost < cost:
         board = neighbor
-        cost = new_cost    
+        cost = new_cost
+    else:
+        # Calculate probability of accepting the neighbor
+        p = math.exp(-(new_cost - cost)/t)
+        if p >= random.random():
+            board = neighbor
+            cost = new_cost
 
-    print("Iteration: ", step, "    Cost: ", cost)
+    print("Iteration: ", step, "    Cost: ", cost, "    Temperature: ", t)
 
 print("--------Solution-----------")
-board.show()         
+board.show()          
 
 #------------------------------------------------------------------------------------------------------------------
 #   End of file
