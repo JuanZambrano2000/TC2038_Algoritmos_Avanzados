@@ -110,9 +110,9 @@ class Board(object):
 #------------------------------------------------------------------------------------------------------------------
 #   Program
 #------------------------------------------------------------------------------------------------------------------
-random.seed(time.time()*1000)
+random.seed(time.time()*1160)
 
-board = Board(5, True)      # Initialize board
+board = Board(8, True)      # Initialize board
 
 print("-------- Initial board -----------")
 board.show()
